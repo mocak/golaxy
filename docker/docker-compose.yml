@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  db_psql:
+    image: postgres:11-alpine
+    container_name: golaxy_psql
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/psql:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: golaxy_admin
+      POSTGRES_PASSWORD: supermassive_black_hole
