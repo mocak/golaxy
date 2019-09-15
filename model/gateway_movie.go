@@ -4,7 +4,7 @@ import "github.com/lib/pq"
 
 type MovieGateway struct{}
 
-func (gw *MovieGateway) Find(id int) (*Movie, error) {
+func (gw MovieGateway) Find(id int) (*Movie, error) {
 	db := getConnection()
 	movie := new(Movie)
 	err := db.QueryRow("SELECT * FROM movies WHERE id = $1", id).Scan(&movie.Id, &movie.Name, &movie.Year, pq.Array(&movie.Genre), &movie.Rating, &movie.Director, pq.Array(&movie.Cast), &movie.CreatedAt)
@@ -16,7 +16,7 @@ func (gw *MovieGateway) Find(id int) (*Movie, error) {
 	return movie, nil
 }
 
-func (gw *MovieGateway) FindAll() ([]*Movie, error) {
+func (gw MovieGateway) FindAll() ([]*Movie, error) {
 	db := getConnection()
 	rows, err := db.Query("SELECT * FROM movies")
 
@@ -41,7 +41,7 @@ func (gw *MovieGateway) FindAll() ([]*Movie, error) {
 	return movies, nil
 }
 
-func (gw *MovieGateway) Insert(movie *Movie) (*Movie, error) {
+func (gw MovieGateway) Insert(movie *Movie) (*Movie, error) {
 	db := getConnection()
 	err := db.QueryRow("INSERT INTO movies (name, rating, year, movie_cast, director, genre) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		movie.Name,
@@ -59,7 +59,7 @@ func (gw *MovieGateway) Insert(movie *Movie) (*Movie, error) {
 	return movie, nil
 }
 
-func (gw *MovieGateway) Update(movie *Movie) (int64, error) {
+func (gw MovieGateway) Update(movie *Movie) (int64, error) {
 	db := getConnection()
 
 	result, err := db.Exec("UPDATE movies SET name = $2, rating = $3, year = $4, movie_cast = $5, director = $6, genre = $7 WHERE id = $1",
@@ -78,7 +78,7 @@ func (gw *MovieGateway) Update(movie *Movie) (int64, error) {
 	return result.RowsAffected()
 }
 
-func (gw *MovieGateway) Delete(id int) (int64, error) {
+func (gw MovieGateway) Delete(id int) (int64, error) {
 	db := getConnection()
 
 	result, err := db.Exec("DELETE FROM movies WHERE id = $1", id)
