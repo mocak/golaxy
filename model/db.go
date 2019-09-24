@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"
 	"log"
+
+	_ "github.com/lib/pq"
 )
 
 const (
@@ -24,7 +25,7 @@ type TableGateway interface {
 	Delete(*struct{}) (int64, error)
 }
 
-func getConnection() *sql.DB {
+func GetConnection() *sql.DB {
 	dbCredentials := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
@@ -45,12 +46,9 @@ func getConnection() *sql.DB {
 	return db
 }
 
-func BootstrapDatabase() {
-	db := getConnection()
-	defer db.Close()
-
+func BootstrapDatabase(db *sql.DB) {
 	createMovieQuery := `
-		DROP TABLE IF EXISTS movies;
+-- 		DROP TABLE IF EXISTS movies;
 		CREATE TABLE movies (
 			id serial PRIMARY KEY, 
 			name varchar (200) NOT NULL, 
@@ -61,7 +59,7 @@ func BootstrapDatabase() {
 			movie_cast text [], 
 			created_at timestamp DEFAULT CURRENT_TIMESTAMP, 
 			UNIQUE (name, year)
-			)`
+		);`
 
 	stmt, err := db.Prepare(createMovieQuery)
 	checkError("preparing statement", err)

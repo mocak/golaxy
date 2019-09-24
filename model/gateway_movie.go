@@ -1,13 +1,23 @@
 package model
 
-import "github.com/lib/pq"
+import (
+	"database/sql"
 
-type MovieGateway struct{}
+	"github.com/lib/pq"
+)
+
+type MovieGateway struct {
+	db *sql.DB
+}
+
+func NewMovieGateway(db *sql.DB) *MovieGateway {
+	return &MovieGateway{db: db}
+}
 
 func (gw MovieGateway) Find(id int) (*Movie, error) {
-	db := getConnection()
+
 	movie := new(Movie)
-	err := db.QueryRow("SELECT * FROM movies WHERE id = $1", id).Scan(&movie.Id, &movie.Name, &movie.Year, pq.Array(&movie.Genre), &movie.Rating, &movie.Director, pq.Array(&movie.Cast), &movie.CreatedAt)
+	err := gw.db.QueryRow("SELECT * FROM movies WHERE id = $1", id).Scan(&movie.Id, &movie.Name, &movie.Year, pq.Array(&movie.Genre), &movie.Rating, &movie.Director, pq.Array(&movie.Cast), &movie.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -17,8 +27,8 @@ func (gw MovieGateway) Find(id int) (*Movie, error) {
 }
 
 func (gw MovieGateway) FindAll() ([]*Movie, error) {
-	db := getConnection()
-	rows, err := db.Query("SELECT * FROM movies")
+
+	rows, err := gw.db.Query("SELECT * FROM movies")
 
 	if err != nil {
 		return nil, err
@@ -42,8 +52,8 @@ func (gw MovieGateway) FindAll() ([]*Movie, error) {
 }
 
 func (gw MovieGateway) Insert(movie *Movie) (*Movie, error) {
-	db := getConnection()
-	err := db.QueryRow("INSERT INTO movies (name, rating, year, movie_cast, director, genre) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+
+	err := gw.db.QueryRow("INSERT INTO movies (name, rating, year, movie_cast, director, genre) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		movie.Name,
 		movie.Rating,
 		movie.Year,
@@ -60,9 +70,8 @@ func (gw MovieGateway) Insert(movie *Movie) (*Movie, error) {
 }
 
 func (gw MovieGateway) Update(movie *Movie) (int64, error) {
-	db := getConnection()
 
-	result, err := db.Exec("UPDATE movies SET name = $2, rating = $3, year = $4, movie_cast = $5, director = $6, genre = $7 WHERE id = $1",
+	result, err := gw.db.Exec("UPDATE movies SET name = $2, rating = $3, year = $4, movie_cast = $5, director = $6, genre = $7 WHERE id = $1",
 		movie.Id,
 		movie.Name,
 		movie.Rating,
@@ -79,9 +88,8 @@ func (gw MovieGateway) Update(movie *Movie) (int64, error) {
 }
 
 func (gw MovieGateway) Delete(id int) (int64, error) {
-	db := getConnection()
 
-	result, err := db.Exec("DELETE FROM movies WHERE id = $1", id)
+	result, err := gw.db.Exec("DELETE FROM movies WHERE id = $1", id)
 	if err != nil {
 		return 0, err
 	}

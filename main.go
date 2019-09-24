@@ -1,10 +1,15 @@
 package main
 
 import (
+	"database/sql"
+	"encoding/json"
 	"fmt"
-	"github.com/srgyrn/golaxy/model"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
+
+	"github.com/srgyrn/golaxy/model"
 )
 
 // init is called prior to main.
@@ -13,12 +18,48 @@ func init() {
 	log.SetOutput(os.Stdout)
 }
 
-func main() {
-	//model.BootstrapDatabase()
+var db *sql.DB
 
-	movieGw := new(model.MovieGateway)
-	//insertMovie(movieGw)
-	getMovie(movieGw)
+func main() {
+
+	db = model.GetConnection()
+	defer db.Close()
+
+	//model.BootstrapDatabase(db)
+
+	http.HandleFunc("/movies/", func(writer http.ResponseWriter, request *http.Request) {
+		switch request.Method {
+		case "GET":
+			id, err := strconv.Atoi(request.URL.Path[len("/movies/"):])
+			if err != nil {
+				http.Error(writer, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			movieGW := model.NewMovieGateway(db)
+			movie, err := movieGW.Find(id)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					http.Error(writer, "", http.StatusNotFound)
+					return
+				}
+
+				http.Error(writer, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			writer.Header().Set("Content-Type", "application/json")
+			writer.WriteHeader(200)
+			if err = json.NewEncoder(writer).Encode(&movie); err != nil {
+				http.Error(writer, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		default:
+			http.Error(writer, "", http.StatusMethodNotAllowed)
+		}
+	})
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func insertMovie(movieGw *model.MovieGateway) {
