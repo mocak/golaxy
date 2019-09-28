@@ -7,6 +7,7 @@ services:
       - "5432:5432"
     volumes:
       - ./db/psql:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: golaxy_admin
       POSTGRES_PASSWORD: supermassive_black_hole
