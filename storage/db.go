@@ -1,4 +1,4 @@
-package model
+package storage
 
 import (
 	"database/sql"
@@ -44,37 +44,4 @@ func GetConnection() *sql.DB {
 	fmt.Println("Database connection successful!")
 
 	return db
-}
-
-func BootstrapDatabase(db *sql.DB) {
-	createMovieQuery := `
--- 		DROP TABLE IF EXISTS movies;
-		CREATE TABLE movies (
-			id serial PRIMARY KEY, 
-			name varchar (200) NOT NULL, 
-			year int NULL CHECK (year > 0), 
-			genre text [] NULL, 
-			rating numeric (2), 
-			director varchar (50), 
-			movie_cast text [], 
-			created_at timestamp DEFAULT CURRENT_TIMESTAMP, 
-			UNIQUE (name, year)
-		);`
-
-	stmt, err := db.Prepare(createMovieQuery)
-	checkError("preparing statement", err)
-	defer stmt.Close()
-
-	_, err = stmt.Exec()
-	checkError("executing statement", err)
-
-	log.Println("Table creation end.")
-}
-
-func checkError(stepDescription string, err error) {
-	if errors.Is(err, nil) {
-		return
-	}
-
-	log.Printf("Table creation failed at %s | %s\n", stepDescription, err.Error())
 }

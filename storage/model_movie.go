@@ -1,4 +1,4 @@
-package model
+package storage
 
 type Movie struct {
 	Id        int
