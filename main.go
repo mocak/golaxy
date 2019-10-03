@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/srgyrn/golaxy/storage"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -15,8 +16,28 @@ func init() {
 
 var db *sql.DB
 
+type MoviePostHandler struct {}
+
+
+type MovieHandler struct {}
+
+func (mph MovieHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "POST":
+		return
+	}
+}
+
 func main() {
 
 	db = storage.GetConnection()
 	defer db.Close()
+
+	http.Handle("/movies/", MovieHandler{})
+
+
+
+
+	log.Fatal(http.ListenAndServe(":8090", nil))
 }
