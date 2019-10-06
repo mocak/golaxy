@@ -11,31 +11,30 @@ import (
 	"strconv"
 )
 
-// RequestHandler is a type of http.Handler
-type RequestHandler struct{}
-
 var movieGW *storage.MovieGateway
 
 func init() {
 	movieGW = &storage.MovieGateway{}
 }
 
-func (mh RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "POST":
-		createMovie(w, r)
-	case "GET":
-		//TODO: Find a better solution
-		id, _ := strconv.Atoi(r.URL.Path[len("/movies/"):])
-		if 0 == id {
-			returnAllMovie(w, r)
+func MakeHandlerFunction() http.HandlerFunc {
+	return func (w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "POST":
+			createMovie(w, r)
+		case "GET":
+			//TODO: Find a better solution
+			id, _ := strconv.Atoi(r.URL.Path[len("/movies/"):])
+			if 0 == id {
+				returnAllMovie(w, r)
+				return
+			}
+
+			returnMovieByID(w, r)
+		default:
+			http.NotFound(w, r)
 			return
 		}
-
-		returnMovieByID(w, r)
-	default:
-		http.Error(w, "", http.StatusMethodNotAllowed)
-		return
 	}
 }
 

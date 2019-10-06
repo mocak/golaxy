@@ -23,5 +23,5 @@ func main() {
 }
 
 func handleRequests() {
-	http.Handle("/movies/", movie.RequestHandler{})
+	http.HandleFunc("/movies/", movie.MakeHandlerFunction())
 }
