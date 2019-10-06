@@ -31,6 +31,10 @@ func MakeHandlerFunction() http.HandlerFunc {
 			}
 
 			returnMovieByID(w, r)
+		case "PUT":
+			updateMovieByID(w,r)
+		case "DELETE":
+			deleteMovieByID(w, r)
 		default:
 			http.NotFound(w, r)
 			return
@@ -89,4 +93,40 @@ func returnMovieByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	movieResponse.SuccessfulResponseListener(w, &movieResponse.Response{Data: &movie})
+}
+
+func updateMovieByID(w http.ResponseWriter, r *http.Request) {
+	body, _ := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	var movie storage.Movie
+
+	err := json.Unmarshal(body, &movie)
+	if !errors.Is(err, nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = movieGW.Update(&movie)
+
+	if !errors.Is(err, nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	movieResponse.SuccessfulResponseListener(w, &movieResponse.Response{Data: &movie})
+}
+
+func deleteMovieByID(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Path[len("/movies/"):])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err = movieGW.Delete(id)
+	if !errors.Is(err, nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	movieResponse.SuccessfulResponseListener(w, &movieResponse.Response{Data: "movie deleted successfully"})
 }
