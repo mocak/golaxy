@@ -1,12 +1,13 @@
 package storage
 
+// Movie is the DTO for table movies
 type Movie struct {
-	Id        int
-	Name      string
-	Year      int
-	Genre     []string
-	Rating    float32
-	Director  string
-	Cast      []string
-	CreatedAt string
+	ID        int      `json:"id"`
+	Name      string   `json:"title"`
+	Year      int      `json:"year_released"`
+	Genre     []string `json:"genre"`
+	Rating    float32  `json:"rating"`
+	Director  string   `json:"director"`
+	Cast      []string `json:"cast"`
+	CreatedAt string   `json:"created_at"`
 }
