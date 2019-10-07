@@ -1,9 +1,10 @@
 package main
 
 import (
-	"database/sql"
+	"github.com/srgyrn/golaxy/controller/movie"
 	"github.com/srgyrn/golaxy/storage"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -13,10 +14,14 @@ func init() {
 	log.SetOutput(os.Stdout)
 }
 
-var db *sql.DB
-
 func main() {
+	storage.InitDB()
+	defer storage.CloseDB()
 
-	db = storage.GetConnection()
-	defer db.Close()
+	handleRequests()
+	log.Fatal(http.ListenAndServe(":8090", nil))
+}
+
+func handleRequests() {
+	http.HandleFunc("/movies/", movie.MakeHandlerFunction())
 }
