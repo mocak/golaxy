@@ -17,6 +17,7 @@ const (
 	dbname   = "golaxy"
 )
 
+// TableGateway defines the functions every table gateway should implement in the project.
 type TableGateway interface {
 	Find(id int) (*struct{}, error)
 	FindAll() (*struct{}, error)
@@ -25,11 +26,15 @@ type TableGateway interface {
 	Delete(*struct{}) (int64, error)
 }
 
-func GetConnection() *sql.DB {
+var db *sql.DB
+
+// InitDB initiates the database connection
+func InitDB() {
+	var err error
 	dbCredentials := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	db, err := sql.Open("postgres", dbCredentials)
+	db, err = sql.Open("postgres", dbCredentials)
 
 	if !errors.Is(err, nil) {
 		log.Panic(err)
@@ -42,6 +47,12 @@ func GetConnection() *sql.DB {
 	}
 
 	fmt.Println("Database connection successful!")
+}
 
-	return db
+// CloseDB closes the database connection.
+func CloseDB() {
+	err := db.Close()
+	if !errors.Is(err, nil) {
+		log.Fatal(err.Error())
+	}
 }
