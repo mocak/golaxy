@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/srgyrn/golaxy/controller/director"
 	"github.com/srgyrn/golaxy/controller/movie"
 	"github.com/srgyrn/golaxy/storage"
 	"log"
@@ -24,4 +25,5 @@ func main() {
 
 func handleRequests() {
 	http.HandleFunc("/movies/", movie.MakeHandlerFunction())
+	http.HandleFunc("/directors/", director.MakeHandlerFunction())
 }
