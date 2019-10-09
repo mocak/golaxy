@@ -1,16 +1,12 @@
 package storage
 
-import (
-	"github.com/lib/pq"
-)
-
 // DirectorGateway is a type of TableGateway
 type DirectorGateway struct{}
 
 // Find retrieves the directors by id
 func (gw DirectorGateway) Find(id int) (*Director, error) {
 	director := new(Director)
-	err := db.QueryRow("SELECT * FROM directors WHERE id = $1", id).Scan(&director.ID, &director.Name, &director.MovieCount, pq.Array(&director.Genre), &director.CreatedAt)
+	err := db.QueryRow("SELECT * FROM directors WHERE id = $1", id).Scan(&director.ID, &director.Name, &director.Surname,&director.Year, &director.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -32,7 +28,7 @@ func (gw DirectorGateway) FindAll() ([]*Director, error) {
 
 	for rows.Next() {
 		director := new(Director)
-		err = rows.Scan(&director.ID, &director.Name, &director.MovieCount, pq.Array(&director.Genre), &director.CreatedAt)
+		err = rows.Scan(&director.ID, &director.Name, &director.Surname, &director.Year, &director.CreatedAt)
 
 		if err != nil {
 			return nil, err
@@ -46,10 +42,10 @@ func (gw DirectorGateway) FindAll() ([]*Director, error) {
 
 // Insert inserts a new row to the directors table
 func (gw DirectorGateway) Insert(director *Director) (*Director, error) {
-	err := db.QueryRow("INSERT INTO directors (name, movie_count, genre) VALUES ($1, $2, $3) RETURNING id",
+	err := db.QueryRow("INSERT INTO directors (name, surname, birth_year) VALUES ($1, $2, $3) RETURNING id",
 		director.Name,
-		director.MovieCount,
-		pq.Array(director.Genre),
+		director.Surname,
+		director.Year,
 	).Scan(&director.ID)
 
 	if err != nil {
@@ -61,11 +57,11 @@ func (gw DirectorGateway) Insert(director *Director) (*Director, error) {
 
 // Update updates a row in directors table by id
 func (gw DirectorGateway) Update(director *Director) (int64, error) {
-	result, err := db.Exec("UPDATE director SET name = $2, movie_count = $3, genre = $4 WHERE id = $1",
+	result, err := db.Exec("UPDATE director SET name = $2, surname = $3, birth_year = $4 WHERE id = $1",
 		director.ID,
 		director.Name,
-		director.MovieCount,
-		pq.Array(director.Genre),
+		director.Surname,
+		director.Year,
 	)
 	if err != nil {
 		return 0, err
