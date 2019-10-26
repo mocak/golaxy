@@ -11,3 +11,14 @@ CREATE TABLE movies
     created_at timestamp DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (name, year)
 );
+
+DROP TABLE IF EXISTS directors;
+CREATE TABLE directors
+(
+    id         serial PRIMARY KEY,
+    name       varchar(200) NOT NULL,
+    surname       varchar(200) NOT NULL   ,
+    birth_year       int       DEFAULT  0 CHECK ( birth_year >0 ),
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (name)
+);

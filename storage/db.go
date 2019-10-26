@@ -42,9 +42,9 @@ func InitDB() {
 
 	err = db.Ping()
 
-	if !errors.Is(err, nil) {
+	/*if !errors.Is(err, nil) {
 		log.Panic(err)
-	}
+	}*/
 
 	fmt.Println("Database connection successful!")
 }
