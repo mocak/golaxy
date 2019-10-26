@@ -6,7 +6,7 @@ type DirectorGateway struct{}
 // Find retrieves the directors by id
 func (gw DirectorGateway) Find(id int) (*Director, error) {
 	director := new(Director)
-	err := db.QueryRow("SELECT * FROM directors WHERE id = $1", id).Scan(&director.ID, &director.Name, &director.Surname,&director.Year, &director.CreatedAt)
+	err := db.QueryRow("SELECT * FROM directors WHERE id = $1", id).Scan(&director.ID, &director.Name, &director.Surname, &director.Year, &director.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (gw DirectorGateway) Insert(director *Director) (*Director, error) {
 
 // Update updates a row in directors table by id
 func (gw DirectorGateway) Update(director *Director) (int64, error) {
-	result, err := db.Exec("UPDATE director SET name = $2, surname = $3, birth_year = $4 WHERE id = $1",
+	result, err := db.Exec("UPDATE directors SET name = $2, surname = $3, birth_year = $4 WHERE id = $1",
 		director.ID,
 		director.Name,
 		director.Surname,

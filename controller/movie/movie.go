@@ -18,7 +18,7 @@ func init() {
 }
 
 func MakeHandlerFunction() http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "POST":
 			createMovie(w, r)
@@ -32,7 +32,7 @@ func MakeHandlerFunction() http.HandlerFunc {
 
 			returnMovieByID(w, r)
 		case "PUT":
-			updateMovieByID(w,r)
+			updateMovieByID(w, r)
 		case "DELETE":
 			deleteMovieByID(w, r)
 		default:

@@ -18,7 +18,7 @@ func init() {
 }
 
 func MakeHandlerFunction() http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "POST":
 			createDirector(w, r)
@@ -32,7 +32,7 @@ func MakeHandlerFunction() http.HandlerFunc {
 
 			returnDirectorByID(w, r)
 		case "PUT":
-			updateDirectorByID(w,r)
+			updateDirectorByID(w, r)
 		case "DELETE":
 			deleteDirectorByID(w, r)
 		default:
