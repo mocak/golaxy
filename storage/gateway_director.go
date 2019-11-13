@@ -16,7 +16,7 @@ func (gw DirectorGateway) Find(id int) (*Director, error) {
 }
 
 // FindAll retrieves all the directors
-func (gw DirectorGateway) FindAll() ([]*Director, error) {
+func (gw DirectorGateway) FindAll() ([]Director, error) {
 	rows, err := db.Query("SELECT * FROM directors")
 
 	if err != nil {
@@ -24,7 +24,7 @@ func (gw DirectorGateway) FindAll() ([]*Director, error) {
 	}
 
 	defer rows.Close()
-	var directors []*Director
+	var directors []Director
 
 	for rows.Next() {
 		director := new(Director)
@@ -34,7 +34,7 @@ func (gw DirectorGateway) FindAll() ([]*Director, error) {
 			return nil, err
 		}
 
-		directors = append(directors, director)
+		directors = append(directors, *director)
 	}
 
 	return directors, nil
