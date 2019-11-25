@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/lib/pq"
+	"log"
 )
 
 // MovieGateway is a type of TableGateway
@@ -108,18 +109,20 @@ func (gw MovieGateway) Insert(movie *Movie) (*Movie, error) {
 		pq.Array(movie.Cast),
 		movie.Director.ID,
 		pq.Array(movie.Genre),
-	).Scan(movie.ID)
+	).Scan(&movie.ID)
 
 	if err != nil {
+		log.Printf("error at creating movie. Data: %v", movie)
 		return nil, err
 	}
 
+	//TODO: return movie with director data
 	return movie, nil
 }
 
 // Update updates a row in movies table by id
 func (gw MovieGateway) Update(movie *Movie) (int64, error) {
-	result, err := db.Exec("UPDATE movies SET name = $2, rating = $3, year = $4, movie_cast = $5, director = $6, genre = $7 WHERE id = $1",
+	result, err := db.Exec("UPDATE movies SET name = $2, rating = $3, year = $4, movie_cast = $5, director_id = $6, genre = $7 WHERE id = $1",
 		movie.ID,
 		movie.Name,
 		movie.Rating,
