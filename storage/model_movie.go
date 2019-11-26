@@ -7,7 +7,7 @@ type Movie struct {
 	Year      int      `json:"year_released"`
 	Genre     []string `json:"genre"`
 	Rating    float32  `json:"rating"`
-	Director  string   `json:"director"`
+	Director  Director   `json:"director"`
 	Cast      []string `json:"cast"`
 	CreatedAt string   `json:"created_at"`
 }
