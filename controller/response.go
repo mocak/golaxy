@@ -10,8 +10,8 @@ type Response struct {
 	Data interface{}
 }
 
-// SuccessfulResponseListener sets necessary information to the response and prevents code duplication
-func SuccessfulResponseListener(w http.ResponseWriter, rsp *Response) {
+// successfulResponseListener sets necessary information to the response and prevents code duplication
+func successfulResponseListener(w http.ResponseWriter, rsp *Response) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	if err := json.NewEncoder(w).Encode(&rsp); err != nil {

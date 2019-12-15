@@ -6,10 +6,18 @@ import (
 )
 
 // MovieGateway is a type of TableGateway
-type MovieGateway struct{}
+type MovieGateway struct{
+	Data []Movie
+}
+
+func NewGateway() TableGateway {
+	return &MovieGateway{
+		Data: nil,
+	}
+}
 
 // Find retrieves the movie by id
-func (gw MovieGateway) Find(id int) (*Movie, error) {
+func (gw MovieGateway) Find(id int) error {
 	movie := new(Movie)
 	err := db.QueryRow(`
 		SELECT m.id,
@@ -42,14 +50,16 @@ func (gw MovieGateway) Find(id int) (*Movie, error) {
 	)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return movie, nil
+	gw.Data = []Movie{*movie}
+
+	return nil
 }
 
 // FindAll retrieves all the movies
-func (gw MovieGateway) FindAll() ([]Movie, error) {
+func (gw MovieGateway) FindAll() error {
 	rows, err := db.Query(`
 		SELECT m.id,
 		       m.name,
@@ -68,7 +78,7 @@ func (gw MovieGateway) FindAll() ([]Movie, error) {
 		`)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer rows.Close()
@@ -91,17 +101,20 @@ func (gw MovieGateway) FindAll() ([]Movie, error) {
 		)
 
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		movies = append(movies, *movie)
 	}
 
-	return movies, nil
+	gw.Data = movies
+
+	return nil
 }
 
 // Insert inserts a new row to the movies table
-func (gw MovieGateway) Insert(movie *Movie) (*Movie, error) {
+func (gw MovieGateway) Insert() error {
+	movie := gw.Data[0]
 	err := db.QueryRow("INSERT INTO movies (name, rating, year, movie_cast, director_id, genre) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		movie.Name,
 		movie.Rating,
@@ -113,15 +126,16 @@ func (gw MovieGateway) Insert(movie *Movie) (*Movie, error) {
 
 	if err != nil {
 		log.Printf("error at creating movie. Data: %v", movie)
-		return nil, err
+		return  err
 	}
 
 	//TODO: return movie with director data
-	return movie, nil
+	return nil
 }
 
 // Update updates a row in movies table by id
-func (gw MovieGateway) Update(movie *Movie) (int64, error) {
+func (gw MovieGateway) Update() (int64, error) {
+	movie := gw.Data[0]
 	result, err := db.Exec("UPDATE movies SET name = $2, rating = $3, year = $4, movie_cast = $5, director_id = $6, genre = $7 WHERE id = $1",
 		movie.ID,
 		movie.Name,

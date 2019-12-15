@@ -19,11 +19,11 @@ const (
 
 // TableGateway defines the functions every table gateway should implement in the project.
 type TableGateway interface {
-	Find(id int) (*struct{}, error)
-	FindAll() (*struct{}, error)
-	Insert(*struct{}) (*struct{}, error)
-	Update(*struct{}) (int64, error)
-	Delete(*struct{}) (int64, error)
+	Find(id int) error
+	FindAll() error
+	Insert() error
+	Update() (int64, error)
+	Delete(id int) (int64, error)
 }
 
 var db *sql.DB
